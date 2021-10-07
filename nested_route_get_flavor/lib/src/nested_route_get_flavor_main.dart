@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 
-const routeHome = '/';
+const routeHome = '/home';
 const routeSettings = '/settings';
 const routePrefixDeviceSetup = '/setup/';
 const routeDeviceSetupStart = '/setup/$routeDeviceSetupStartPage';
@@ -11,7 +11,7 @@ const routeDeviceSetupConnectingPage = 'connecting';
 const routeDeviceSetupFinishedPage = 'finished';
 
 void main() {
-  runApp(GetMaterialApp.router(
+  runApp(GetMaterialApp(
     theme: ThemeData(
       brightness: Brightness.dark,
       appBarTheme: const AppBarTheme(
@@ -22,9 +22,22 @@ void main() {
       ),
     ),
     debugShowCheckedModeBanner: false,
+    initialRoute: routeHome,
+    unknownRoute: GetPage(
+      name: '/unknown',
+      page: () => Scaffold(
+        appBar: AppBar(
+          title: const Text('Unknown Route'),
+        ),
+        body: const Center(
+          child: Text('Unknown Route'),
+        ),
+      ),
+    ),
     getPages: [
       GetPage(name: routeHome, page: () => const HomeScreen()),
       GetPage(name: routeSettings, page: () => const SettingsScreen()),
+      GetPage(name: routeDeviceSetupStart, page: () => const SetupFlow()),
     ],
   ));
 }
@@ -37,17 +50,15 @@ class SetupFlow extends StatefulWidget {
 
   const SetupFlow({
     Key? key,
-    required this.setupPageRoute,
   }) : super(key: key);
-
-  final String setupPageRoute;
 
   @override
   SetupFlowState createState() => SetupFlowState();
 }
 
 class SetupFlowState extends State<SetupFlow> {
-  final _navigatorKey = GlobalKey<NavigatorState>();
+  ///TODO: why only can use key with int???
+  final _navigatorKey = Get.nestedKey(1);
 
   @override
   void initState() {
@@ -55,15 +66,15 @@ class SetupFlowState extends State<SetupFlow> {
   }
 
   void _onDiscoveryComplete() {
-    _navigatorKey.currentState!.pushNamed(routeDeviceSetupSelectDevicePage);
+    _navigatorKey!.currentState!.pushNamed(routeDeviceSetupSelectDevicePage);
   }
 
   void _onDeviceSelected(String deviceId) {
-    _navigatorKey.currentState!.pushNamed(routeDeviceSetupConnectingPage);
+    _navigatorKey!.currentState!.pushNamed(routeDeviceSetupConnectingPage);
   }
 
   void _onConnectionEstablished() {
-    _navigatorKey.currentState!.pushNamed(routeDeviceSetupFinishedPage);
+    _navigatorKey!.currentState!.pushNamed(routeDeviceSetupFinishedPage);
   }
 
   Future<void> _onExitPressed() async {
@@ -113,7 +124,7 @@ class SetupFlowState extends State<SetupFlow> {
         appBar: _buildFlowAppBar(),
         body: Navigator(
           key: _navigatorKey,
-          initialRoute: widget.setupPageRoute,
+          initialRoute: routeDeviceSetupStartPage,
           onGenerateRoute: _onGenerateRoute,
         ),
       ),
@@ -147,6 +158,10 @@ class SetupFlowState extends State<SetupFlow> {
         break;
     }
 
+    return GetPageRoute(
+      page: () => page,
+      settings: settings,
+    );
     return MaterialPageRoute<dynamic>(
       builder: (context) {
         return page;
@@ -320,7 +335,10 @@ class FinishedPage extends StatelessWidget {
                     return const StadiumBorder();
                   }),
                 ),
-                onPressed: onFinishPressed,
+                onPressed: () {
+                  // onFinishPressed();
+                  Get.back(id: 1);
+                },
                 child: const Text(
                   'Finish',
                   style: TextStyle(
@@ -380,7 +398,8 @@ class HomeScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Navigator.of(context).pushNamed(routeDeviceSetupStart);
-          Get.toNamed(routeSettings);
+          // Get.toNamed(routeSettings);
+          Get.toNamed(routeDeviceSetupStart);
         },
         child: const Icon(Icons.add),
       ),
@@ -394,7 +413,8 @@ class HomeScreen extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () {
-            Navigator.pushNamed(context, routeSettings);
+            // Navigator.pushNamed(context, routeSettings);
+            Get.toNamed(routeSettings);
           },
         ),
       ],
