@@ -1,0 +1,2 @@
+run: ./flutter_run.sh env/.env
+nested_run: ./flutter_run.sh env/.env_nested
