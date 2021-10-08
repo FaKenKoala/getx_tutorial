@@ -1,5 +1,6 @@
 {
     "conventionalCommits.scopes": [
-        "main scope"
+        "main scope",
+        "nested_route"
     ]
 }
