@@ -5,6 +5,7 @@ import 'dart:developer' as developer;
 // import 'package:nested_route_package/nested_route_package.dart' as nested_route;
 import 'nested_main.dart' as nested_main;
 
+// what
 class EnvironmentConfig {
   static const nestedRoute =
       bool.fromEnvironment('nested_route', defaultValue: false);
